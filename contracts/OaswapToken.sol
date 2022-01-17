@@ -6,20 +6,39 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-// Oaswap Token with Governance.
+// Oaswap Token with Governance
 contract OaswapToken is ERC20('Oaswap Token', 'OAS'), Ownable {
+    // OAS-ROSE LP token address
+    address public oaswapPairAddress;
+
     constructor() public {
         mint(msg.sender, 5000000000000000000000);
     }
+
+    /// @notice Sets the Oaswap LP token address
+    function setOaswapPairAddress(address _oaswapPairAddress) external onlyOwner() {
+        oaswapPairAddress = _oaswapPairAddress;
+    }
     
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
-    function mint(address _to, uint256 _amount) public onlyOwner {
+    function mint(address _to, uint256 _amount) public onlyOwner() {
         _mint(_to, _amount);
         _moveDelegates(address(0), _delegates[_to], _amount);
     }
 
-    function burn(uint256 amount) external {
-        _burn(msg.sender, amount);
+    /**
+     * @dev Destroys `amount` tokens from `account`, reducing the
+     * total supply.
+     *
+     * Emits a {Transfer} event with `to` set to the zero address.
+     *
+     * Requirements:
+     *
+     * - `account` cannot be the zero address.
+     * - `account` must have at least `amount` tokens.
+     */
+    function burn(uint256 _amount) external {
+        _burn(msg.sender, _amount);
     }
 
     // Copied and modified from YAM code:
